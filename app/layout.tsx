@@ -15,8 +15,20 @@ const bodyFont = Noto_Sans_Thai({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://www.titanq.fyi"),
   title: "Titan",
   description: "Titan's personal website",
+  openGraph: {
+    title: "Titan",
+    description: "Titan's personal website",
+    url: "https://www.titanq.fyi",
+    siteName: "Titan",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Titan",
+    description: "Titan's personal website",
+  },
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
