@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { siTiktok, siDiscord } from "simple-icons";
+import { siTiktok } from "simple-icons";
 import { LightboxImage } from "./components/LightboxImage";
 import { ContactFab } from "./components/ContactFab";
 
@@ -62,10 +62,9 @@ const programs = [
     bullets: {
       en: [
         "🔴 Automatically closes any stuck FiveM process",
-        "🧹 Clears cache (cache + server-cache) completely in one click",
+        "🧹 Clears cache completely in one click",
         "📝 Step-by-step log so you can follow along easily",
         "📦 Single file, no install, no admin rights needed",
-        "🎨 Clean dark-themed UI, easy to use",
       ],
       th: [
         "🔴 ปิดโปรแกรม FiveM ที่ค้างให้อัตโนมัติ",
@@ -124,17 +123,6 @@ const contactLinks = [
       </svg>
     ),
   },
-  {
-    label: "Discord",
-    value: "your-discord-username",
-    href: "#",
-    accent: "blurple" as const,
-    icon: (
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-        <path d={siDiscord.path} />
-      </svg>
-    ),
-  },
 ];
 
 const accentColors = {
@@ -148,20 +136,16 @@ const accentColors = {
     iconBg: "bg-[#ff2bd6]/10",
     iconText: "text-[#ff2bd6]",
   },
-  blurple: {
-    border: "border-[#7289da]/25",
-    iconBg: "bg-[#7289da]/10",
-    iconText: "text-[#7289da]",
-  },
 };
 
 export default function Home() {
-  const [lang, setLang] = useState<Lang>("en");
+  const [lang, setLang] = useState<Lang>("th");
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     const stored = window.localStorage.getItem("titan-lang");
     // Syncing from localStorage (a real external source) after mount, so the
-    // server-rendered "en" default matches the client's first paint and hydration doesn't mismatch.
+    // server-rendered "th" default matches the client's first paint and hydration doesn't mismatch.
     // eslint-disable-next-line react-hooks/set-state-in-effect
     if (stored === "en" || stored === "th") setLang(stored);
   }, []);
@@ -183,7 +167,8 @@ export default function Home() {
           <span className="font-display text-lg font-bold text-white">
             TITAN<span className="text-[#39ff88]">.exe</span>
           </span>
-          <div className="flex items-center gap-6 text-sm font-medium tracking-wide text-[#9d94b8]">
+
+          <div className="hidden items-center gap-6 text-sm font-medium tracking-wide text-[#9d94b8] sm:flex">
             <a href="#about" className="hover:text-[#39ff88]">
               {t.navAbout}
             </a>
@@ -220,10 +205,62 @@ export default function Home() {
               </button>
             </div>
           </div>
+
+          <button
+            type="button"
+            onClick={() => setMobileMenuOpen((open) => !open)}
+            aria-label="Menu"
+            aria-expanded={mobileMenuOpen}
+            className="flex h-9 w-9 items-center justify-center border border-white/15 text-[#9d94b8] sm:hidden"
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round">
+              {mobileMenuOpen ? <path d="M6 6l12 12M18 6 6 18" /> : <path d="M4 7h16M4 12h16M4 17h16" />}
+            </svg>
+          </button>
         </nav>
+
+        {mobileMenuOpen && (
+          <div className="flex flex-col gap-4 border-t border-white/10 px-6 py-5 text-sm font-medium tracking-wide text-[#9d94b8] sm:hidden">
+            <a href="#about" onClick={() => setMobileMenuOpen(false)} className="hover:text-[#39ff88]">
+              {t.navAbout}
+            </a>
+            <a href="#programs" onClick={() => setMobileMenuOpen(false)} className="hover:text-[#39ff88]">
+              {t.navPrograms}
+            </a>
+            <a href="#contact" onClick={() => setMobileMenuOpen(false)} className="hover:text-[#39ff88]">
+              {t.navContact}
+            </a>
+            <div className="flex items-center gap-0.5 border border-white/15 p-0.5 text-xs font-semibold">
+              <button
+                type="button"
+                onClick={() => handleSetLang("en")}
+                aria-pressed={lang === "en"}
+                className={
+                  lang === "en"
+                    ? "bg-[#39ff88] px-2 py-1 text-[#0a0612]"
+                    : "px-2 py-1 text-[#9d94b8] hover:text-white"
+                }
+              >
+                EN
+              </button>
+              <button
+                type="button"
+                onClick={() => handleSetLang("th")}
+                aria-pressed={lang === "th"}
+                className={
+                  lang === "th"
+                    ? "bg-[#39ff88] px-2 py-1 text-[#0a0612]"
+                    : "px-2 py-1 text-[#9d94b8] hover:text-white"
+                }
+              >
+                TH
+              </button>
+            </div>
+          </div>
+        )}
       </header>
 
-      <main className="relative z-[1] mx-auto flex w-full max-w-4xl flex-1 flex-col gap-20 px-6 py-24">
+      <main className="relative z-[1] mx-auto flex w-full max-w-4xl flex-1 flex-col gap-20 px-6 pb-24 pt-10">
         <section className="flex flex-col items-start gap-6">
           <span className="font-display text-sm text-[#39ff88]">
             {t.eyebrow}
@@ -315,7 +352,7 @@ export default function Home() {
                 </div>
 
                 <div className="flex flex-1 flex-col gap-3 p-6">
-                  <h3 className="font-display text-[15px] font-semibold text-white">
+                  <h3 className="font-display text-[16px] font-semibold text-white">
                     {program.name[lang]}
                   </h3>
                   <div className="flex flex-1 flex-col gap-2">
