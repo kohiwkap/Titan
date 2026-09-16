@@ -17,7 +17,10 @@ const ui = {
     ctaPrograms: "Programs",
     ctaContact: "Contact Me",
     aboutHeading: "// About",
-    aboutBody: "My name is Titan, and I have programs free for all.",
+    aboutHook: "Websites starting at a few hundred baht — cheaper than boba for the whole squad. 🧋",
+    aboutBody: "I build personal sites, squad sites, whatever website you've got in mind.",
+    aboutPricing: "Price is negotiable. Domain cost not included.",
+    aboutCta: "Got an idea so wild it sounds impossible? Throw it at me — I'm down to try (and down to go read the docs). 😅",
     programsHeading: "// Free Programs",
     contactHeading: "// Contact",
     download: "Download",
@@ -34,7 +37,10 @@ const ui = {
     ctaPrograms: "โปรแกรม",
     ctaContact: "ติดต่อฉัน",
     aboutHeading: "// เกี่ยวกับ",
-    aboutBody: "ผมชื่อ Titan มีโปรแกรมแจกฟรีให้โหลดกัน",
+    aboutHook: "เว็บไซต์ราคาหลักร้อย ถูกกว่าค่าชานมไข่มุกทั้งแก๊ง 🧋",
+    aboutBody: "รับทำเว็บส่วนตัว เว็บแก๊ง เว็บอะไรก็ว่ามา",
+    aboutPricing: "ราคาคุยกัน ไม่รวมค่าโดเมนนะครับ",
+    aboutCta: "ไอเดียหลุดโลกแค่ไหนก็เสนอมา ผมพร้อมลอง (และพร้อมไปนั่งอ่านวิธีทำ) 😅",
     programsHeading: "// โปรแกรมแจกฟรี",
     contactHeading: "// ติดต่อ",
     download: "ดาวน์โหลด",
@@ -50,17 +56,46 @@ const programs = [
     image: "/fivem-cache-cleaner-1200x675-dark.png" as string | undefined,
     name: { en: "FiveM Cache Cleaner", th: "เคลียร์แคช Fivem" },
     description: {
-      en: "Clear your FiveM cache in a single click.",
-      th: "เคลียร์แคช Fivem ได้เลยในคลิกเดียว",
+      en: "Clear your FiveM cache in a single click!",
+      th: "เคลียร์แคช Fivem ได้เลยในคลิกเดียว!",
     },
+    bullets: {
+      en: [
+        "🔴 Automatically closes any stuck FiveM process",
+        "🧹 Clears cache (cache + server-cache) completely in one click",
+        "📝 Step-by-step log so you can follow along easily",
+        "📦 Single file, no install, no admin rights needed",
+        "🎨 Clean dark-themed UI, easy to use",
+      ],
+      th: [
+        "🔴 ปิดโปรแกรม FiveM ที่ค้างให้อัตโนมัติ",
+        "🧹 ลบแคช (cache + server-cache) ให้ครบในคลิกเดียว",
+        "📝 มี log แสดงทีละขั้นตอน อ่านง่าย",
+        "📦 ไฟล์เดียวจบ ไม่ต้องติดตั้ง ไม่ต้องรัน Admin",
+      ],
+    } as { en: string[]; th: string[] } | undefined,
   },
   {
     downloadUrl: "/FPSBooster.rar",
     image: "/fps-booster-1200x675-dark.png" as string | undefined,
-    name: { en: "FPS Booster", th: "FPS Booster" },
+    name: { en: "🚀 FPS Booster", th: "🚀 FPS Booster" },
     description: {
-      en: "Boosts your frame rate for smoother gameplay.",
-      th: "โปรแกรมช่วยเพิ่มเฟรมเรต ให้เล่นเกมลื่นขึ้น",
+      en: "Unlock your gaming rig's full power in one click! 🎮",
+      th: "ปลดล็อกพลังเครื่องเกมมิ่งของคุณในคลิกเดียว! 🎮",
+    },
+    bullets: {
+      en: [
+        "⚡ Speed boost with Ultimate Performance Mode",
+        "🖥️ Unleash your CPU/GPU to full throttle, zero stutter",
+        "📶 Auto latency reduction for smooth, low-ping play",
+        "🧹 Wipe junk files, cache, and history in one click",
+      ],
+      th: [
+        "⚡ เร่งสปีดด้วย Ultimate Performance Mode",
+        "🖥️ ปลดล็อก CPU/GPU ให้ลุยเต็มสูบ ไม่สะดุด",
+        "📶 ลด Latency อัตโนมัติ เน็ตลื่น ปิงต่ำ",
+        "🧹 ล้างไฟล์ขยะ แคช และประวัติ ในปุ่มเดียว",
+      ],
     },
   },
 ];
@@ -233,8 +268,17 @@ export default function Home() {
           <h2 className="font-display text-2xl font-semibold text-white">
             {t.aboutHeading}
           </h2>
+          <p className="font-display max-w-2xl text-xl font-semibold leading-8 text-[#39ff88]">
+            {t.aboutHook}
+          </p>
           <p className="max-w-2xl text-base leading-7 text-[#9d94b8]">
             {t.aboutBody}
+          </p>
+          <p className="max-w-2xl text-sm leading-6 text-[#5c5573]">
+            {t.aboutPricing}
+          </p>
+          <p className="max-w-2xl text-base leading-7 text-white">
+            {t.aboutCta}
           </p>
         </section>
 
@@ -274,12 +318,31 @@ export default function Home() {
                   <h3 className="font-display text-[15px] font-semibold text-white">
                     {program.name[lang]}
                   </h3>
-                  <p className="flex-1 text-sm leading-6 text-[#9d94b8]">
-                    {program.description[lang]}
-                  </p>
+                  <div className="flex flex-1 flex-col gap-2">
+                    <p className="text-sm leading-6 text-[#9d94b8]">
+                      {program.description[lang]}
+                    </p>
+                    {program.bullets && (
+                      <ul className="flex flex-col gap-1.5">
+                        {program.bullets[lang].map((bullet) => (
+                          <li key={bullet} className="text-sm leading-6 text-[#9d94b8]">
+                            {bullet}
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                  </div>
                   <a
                     href={program.downloadUrl}
                     download
+                    onClick={() => {
+                      fetch("/api/track-download", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ program: program.name.en }),
+                        keepalive: true,
+                      }).catch(() => {});
+                    }}
                     className="inline-flex h-9 w-fit items-center justify-center border border-[#ff2bd6] px-4 text-xs font-semibold text-[#ff8fe8] transition-colors hover:bg-[#ff2bd6]/10"
                   >
                     {t.download}

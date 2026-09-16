@@ -1,14 +1,14 @@
 import type { Metadata } from "next";
-import { Chakra_Petch, Sarabun } from "next/font/google";
+import { IBM_Plex_Sans_Thai, Noto_Sans_Thai } from "next/font/google";
 import "./globals.css";
 
-const chakraPetch = Chakra_Petch({
+const displayFont = IBM_Plex_Sans_Thai({
   variable: "--font-display",
   subsets: ["latin", "thai"],
   weight: ["500", "600", "700"],
 });
 
-const sarabun = Sarabun({
+const bodyFont = Noto_Sans_Thai({
   variable: "--font-sans",
   subsets: ["latin", "thai"],
   weight: ["400", "500", "600"],
@@ -23,7 +23,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="en"
-      className={`${chakraPetch.variable} ${sarabun.variable} h-full antialiased`}
+      className={`${displayFont.variable} ${bodyFont.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">{children}</body>
     </html>
