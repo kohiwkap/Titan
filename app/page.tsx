@@ -1,122 +1,328 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import { siTiktok, siDiscord } from "simple-icons";
+import { LightboxImage } from "./components/LightboxImage";
+import { ContactFab } from "./components/ContactFab";
+
+type Lang = "en" | "th";
+
+const ui = {
+  en: {
+    navAbout: "About",
+    navPrograms: "Programs",
+    navContact: "Contact",
+    eyebrow: "[SYSTEM] loading profile: titan.dat",
+    heroTagline: "Welcome!",
+    ctaPrograms: "Programs",
+    ctaContact: "Contact Me",
+    aboutHeading: "// About",
+    aboutBody: "My name is Titan, and I have programs free for all.",
+    programsHeading: "// Free Programs",
+    contactHeading: "// Contact",
+    download: "Download",
+    noImage: "no image",
+    emailLabel: "Email",
+    footer: (year: number) => `© ${year} Titan. All rights reserved.`,
+  },
+  th: {
+    navAbout: "เกี่ยวกับ",
+    navPrograms: "โปรแกรม",
+    navContact: "ติดต่อ",
+    eyebrow: "[SYSTEM] loading profile: titan.dat",
+    heroTagline: "ยินดีต้อนรับ!",
+    ctaPrograms: "โปรแกรม",
+    ctaContact: "ติดต่อฉัน",
+    aboutHeading: "// เกี่ยวกับ",
+    aboutBody: "ผมชื่อ Titan มีโปรแกรมแจกฟรีให้โหลดกัน",
+    programsHeading: "// โปรแกรมแจกฟรี",
+    contactHeading: "// ติดต่อ",
+    download: "ดาวน์โหลด",
+    noImage: "ไม่มีภาพ",
+    emailLabel: "อีเมล",
+    footer: (year: number) => `© ${year} Titan สงวนลิขสิทธิ์`,
+  },
+} as const;
+
 const programs = [
   {
-    name: "โปรแกรมของฉัน #1",
-    description: "คำอธิบายสั้น ๆ ว่าโปรแกรมนี้ทำอะไรได้บ้าง",
-    downloadUrl: "#",
+    downloadUrl: "/ClearFiveMCache.rar",
+    image: "/fivem-cache-cleaner-1200x675-dark.png" as string | undefined,
+    name: { en: "FiveM Cache Cleaner", th: "เคลียร์แคช Fivem" },
+    description: {
+      en: "Clear your FiveM cache in a single click.",
+      th: "เคลียร์แคช Fivem ได้เลยในคลิกเดียว",
+    },
   },
   {
-    name: "โปรแกรมของฉัน #2",
-    description: "คำอธิบายสั้น ๆ ว่าโปรแกรมนี้ทำอะไรได้บ้าง",
-    downloadUrl: "#",
-  },
-  {
-    name: "โปรแกรมของฉัน #3",
-    description: "คำอธิบายสั้น ๆ ว่าโปรแกรมนี้ทำอะไรได้บ้าง",
-    downloadUrl: "#",
+    downloadUrl: "/FPSBooster.rar",
+    image: "/fps-booster-1200x675-dark.png" as string | undefined,
+    name: { en: "FPS Booster", th: "FPS Booster" },
+    description: {
+      en: "Boosts your frame rate for smoother gameplay.",
+      th: "โปรแกรมช่วยเพิ่มเฟรมเรต ให้เล่นเกมลื่นขึ้น",
+    },
   },
 ];
 
 const contactLinks = [
-  { label: "Email", value: "your-email@example.com", href: "mailto:your-email@example.com" },
-  { label: "TikTok", value: "@your-tiktok", href: "https://www.tiktok.com/@your-tiktok" },
-  { label: "Social", value: "your-social-handle", href: "#" },
+  {
+    labelKey: "emailLabel" as const,
+    value: "titan.moorez@gmail.com",
+    href: "mailto:titan.moorez@gmail.com",
+    accent: "green" as const,
+    icon: (
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+        <rect x="3" y="5" width="18" height="14" rx="2" />
+        <path d="m3 7 9 6 9-6" />
+      </svg>
+    ),
+  },
+  {
+    label: "TikTok",
+    value: "ทท",
+    href: "https://www.tiktok.com/@titancommandprompt",
+    accent: "pink" as const,
+    icon: (
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+        <path d={siTiktok.path} />
+      </svg>
+    ),
+  },
+  {
+    label: "Discord",
+    value: "your-discord-username",
+    href: "#",
+    accent: "blurple" as const,
+    icon: (
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+        <path d={siDiscord.path} />
+      </svg>
+    ),
+  },
 ];
 
+const accentColors = {
+  green: {
+    border: "border-[#39ff88]/25",
+    iconBg: "bg-[#39ff88]/10",
+    iconText: "text-[#39ff88]",
+  },
+  pink: {
+    border: "border-[#ff2bd6]/25",
+    iconBg: "bg-[#ff2bd6]/10",
+    iconText: "text-[#ff2bd6]",
+  },
+  blurple: {
+    border: "border-[#7289da]/25",
+    iconBg: "bg-[#7289da]/10",
+    iconText: "text-[#7289da]",
+  },
+};
+
 export default function Home() {
+  const [lang, setLang] = useState<Lang>("en");
+
+  useEffect(() => {
+    const stored = window.localStorage.getItem("titan-lang");
+    // Syncing from localStorage (a real external source) after mount, so the
+    // server-rendered "en" default matches the client's first paint and hydration doesn't mismatch.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    if (stored === "en" || stored === "th") setLang(stored);
+  }, []);
+
+  const handleSetLang = (next: Lang) => {
+    setLang(next);
+    window.localStorage.setItem("titan-lang", next);
+  };
+
+  const t = ui[lang];
+
   return (
-    <div className="flex flex-1 flex-col bg-zinc-50 font-sans text-zinc-900 dark:bg-black dark:text-zinc-50">
-      <header className="sticky top-0 z-10 border-b border-black/[.06] bg-zinc-50/80 backdrop-blur dark:border-white/[.08] dark:bg-black/80">
-        <nav className="mx-auto flex w-full max-w-4xl items-center justify-between px-6 py-4">
-          <span className="text-lg font-semibold tracking-tight">Titan</span>
-          <div className="flex gap-6 text-sm font-medium text-zinc-600 dark:text-zinc-400">
-            <a href="#about" className="hover:text-zinc-950 dark:hover:text-zinc-50">
-              About
+    <div className="relative flex flex-1 flex-col overflow-hidden bg-[#0a0612] font-sans text-[#e3dcf4]">
+      <div className="pointer-events-none absolute inset-0 bg-[repeating-linear-gradient(0deg,rgba(255,255,255,0.04)_0px,rgba(255,255,255,0.04)_1px,transparent_1px,transparent_3px)]" />
+      <div className="pointer-events-none absolute inset-x-0 top-0 h-1.5 bg-gradient-to-r from-[#ff2bd6] via-[#39ff88] to-[#ff2bd6] opacity-70" />
+
+      <header className="sticky top-0 z-10 border-b border-[#ff2bd6]/20 bg-[#0a0612]/90 backdrop-blur">
+        <nav className="mx-auto flex w-full max-w-4xl items-center justify-between px-6 py-5">
+          <span className="font-display text-lg font-bold text-white">
+            TITAN<span className="text-[#39ff88]">.exe</span>
+          </span>
+          <div className="flex items-center gap-6 text-sm font-medium tracking-wide text-[#9d94b8]">
+            <a href="#about" className="hover:text-[#39ff88]">
+              {t.navAbout}
             </a>
-            <a href="#programs" className="hover:text-zinc-950 dark:hover:text-zinc-50">
-              ผลงาน
+            <a href="#programs" className="hover:text-[#39ff88]">
+              {t.navPrograms}
             </a>
-            <a href="#contact" className="hover:text-zinc-950 dark:hover:text-zinc-50">
-              ติดต่อ
+            <a href="#contact" className="hover:text-[#39ff88]">
+              {t.navContact}
             </a>
+            <div className="flex items-center gap-0.5 border border-white/15 p-0.5 text-xs font-semibold">
+              <button
+                type="button"
+                onClick={() => handleSetLang("en")}
+                aria-pressed={lang === "en"}
+                className={
+                  lang === "en"
+                    ? "bg-[#39ff88] px-2 py-1 text-[#0a0612]"
+                    : "px-2 py-1 text-[#9d94b8] hover:text-white"
+                }
+              >
+                EN
+              </button>
+              <button
+                type="button"
+                onClick={() => handleSetLang("th")}
+                aria-pressed={lang === "th"}
+                className={
+                  lang === "th"
+                    ? "bg-[#39ff88] px-2 py-1 text-[#0a0612]"
+                    : "px-2 py-1 text-[#9d94b8] hover:text-white"
+                }
+              >
+                TH
+              </button>
+            </div>
           </div>
         </nav>
       </header>
 
-      <main className="mx-auto flex w-full max-w-4xl flex-1 flex-col gap-32 px-6 py-24">
+      <main className="relative z-[1] mx-auto flex w-full max-w-4xl flex-1 flex-col gap-20 px-6 py-24">
         <section className="flex flex-col items-start gap-6">
-          <h1 className="text-5xl font-bold tracking-tight sm:text-6xl">Titan</h1>
-          <p className="max-w-lg text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            ยินดีต้อนรับสู่เว็บไซต์ส่วนตัวของ Titan
+          <span className="font-display text-sm text-[#39ff88]">
+            {t.eyebrow}
+          </span>
+          <div className="relative inline-block leading-none">
+            <h1
+              aria-hidden
+              className="glitch-layer-a pointer-events-none absolute -left-[3px] top-0 font-display text-6xl font-bold text-[#ff2bd6]/75 mix-blend-screen sm:text-7xl"
+            >
+              TITAN
+            </h1>
+            <h1
+              aria-hidden
+              className="glitch-layer-b pointer-events-none absolute left-[3px] top-0 font-display text-6xl font-bold text-[#39ff88]/75 mix-blend-screen sm:text-7xl"
+            >
+              TITAN
+            </h1>
+            <h1 className="glitch-main relative font-display text-6xl font-bold tracking-tight text-white sm:text-7xl">
+              TITAN
+            </h1>
+          </div>
+          <p className="max-w-lg text-lg leading-8 text-[#9d94b8]">
+            {t.heroTagline}
           </p>
           <div className="flex gap-4">
             <a
               href="#programs"
-              className="flex h-11 items-center justify-center rounded-full bg-foreground px-6 text-sm font-medium text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc]"
+              className="flex h-11 items-center justify-center bg-[#ff2bd6] px-6 text-sm font-bold uppercase tracking-wide text-[#0a0612] transition-shadow [clip-path:polygon(0_0,100%_0,100%_70%,92%_100%,0_100%)] hover:shadow-[0_0_22px_rgba(255,43,214,0.5)]"
             >
-              ดูผลงาน
+              {t.ctaPrograms}
             </a>
             <a
               href="#contact"
-              className="flex h-11 items-center justify-center rounded-full border border-black/[.08] px-6 text-sm font-medium transition-colors hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a]"
+              className="flex h-11 items-center justify-center border border-[#39ff88] px-6 text-sm font-bold uppercase tracking-wide text-[#39ff88] transition-shadow [clip-path:polygon(0_0,100%_0,100%_100%,8%_100%,0_30%)] hover:shadow-[0_0_22px_rgba(57,255,136,0.5)]"
             >
-              ติดต่อฉัน
+              {t.ctaContact}
             </a>
           </div>
         </section>
 
         <section id="about" className="flex flex-col gap-4">
-          <h2 className="text-2xl font-semibold tracking-tight">About</h2>
-          <p className="max-w-2xl text-base leading-7 text-zinc-600 dark:text-zinc-400">
-            เขียนแนะนำตัวสั้น ๆ ที่นี่ เช่น คุณเป็นใคร ทำอะไร สนใจเรื่องอะไร
-            หรือมีประสบการณ์ด้านไหนบ้าง
+          <h2 className="font-display text-2xl font-semibold text-white">
+            {t.aboutHeading}
+          </h2>
+          <p className="max-w-2xl text-base leading-7 text-[#9d94b8]">
+            {t.aboutBody}
           </p>
         </section>
 
         <section id="programs" className="flex flex-col gap-6">
-          <h2 className="text-2xl font-semibold tracking-tight">ผลงาน / โปรแกรมแจก</h2>
-          <div className="grid gap-4 sm:grid-cols-2">
+          <h2 className="font-display text-2xl font-semibold text-white">
+            {t.programsHeading}
+          </h2>
+          <div className="grid gap-5 sm:grid-cols-2">
             {programs.map((program) => (
               <div
-                key={program.name}
-                className="flex flex-col gap-3 rounded-2xl border border-black/[.08] p-6 dark:border-white/[.145]"
+                key={program.name.en}
+                className="relative flex flex-col border border-white/10 bg-[#120c1e]"
               >
-                <h3 className="text-lg font-semibold">{program.name}</h3>
-                <p className="flex-1 text-sm leading-6 text-zinc-600 dark:text-zinc-400">
-                  {program.description}
-                </p>
-                <a
-                  href={program.downloadUrl}
-                  className="inline-flex h-10 w-fit items-center justify-center rounded-full border border-black/[.08] px-5 text-sm font-medium transition-colors hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a]"
-                >
-                  ดาวน์โหลด
-                </a>
+                <span className="absolute left-0 top-0 z-10 h-2.5 w-2.5 border-l-2 border-t-2 border-[#39ff88]" />
+                <span className="absolute bottom-0 right-0 z-10 h-2.5 w-2.5 border-b-2 border-r-2 border-[#ff2bd6]" />
+
+                <div className="relative aspect-video w-full overflow-hidden border-b border-white/10 bg-black/40">
+                  {program.image ? (
+                    <LightboxImage
+                      src={program.image}
+                      alt={program.name[lang]}
+                      sizes="(min-width: 640px) 50vw, 100vw"
+                    />
+                  ) : (
+                    <div className="flex h-full w-full flex-col items-center justify-center gap-2 text-[#4a4460]">
+                      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round">
+                        <rect x="3" y="3" width="18" height="18" rx="2" />
+                        <circle cx="9" cy="9" r="2" />
+                        <path d="m21 15-5-5L5 21" />
+                      </svg>
+                      <span className="font-display text-[10px] uppercase tracking-widest">{t.noImage}</span>
+                    </div>
+                  )}
+                </div>
+
+                <div className="flex flex-1 flex-col gap-3 p-6">
+                  <h3 className="font-display text-[15px] font-semibold text-white">
+                    {program.name[lang]}
+                  </h3>
+                  <p className="flex-1 text-sm leading-6 text-[#9d94b8]">
+                    {program.description[lang]}
+                  </p>
+                  <a
+                    href={program.downloadUrl}
+                    download
+                    className="inline-flex h-9 w-fit items-center justify-center border border-[#ff2bd6] px-4 text-xs font-semibold text-[#ff8fe8] transition-colors hover:bg-[#ff2bd6]/10"
+                  >
+                    {t.download}
+                  </a>
+                </div>
               </div>
             ))}
           </div>
         </section>
 
         <section id="contact" className="flex flex-col gap-4">
-          <h2 className="text-2xl font-semibold tracking-tight">ติดต่อ</h2>
-          <div className="flex flex-col gap-3">
+          <h2 className="font-display text-2xl font-semibold text-white">
+            {t.contactHeading}
+          </h2>
+          <div className="flex flex-col gap-2.5">
             {contactLinks.map((link) => (
               <a
-                key={link.label}
+                key={link.label ?? link.labelKey}
                 href={link.href}
-                className="flex w-fit items-center gap-3 text-base text-zinc-600 transition-colors hover:text-zinc-950 dark:text-zinc-400 dark:hover:text-zinc-50"
+                className={`flex items-center gap-3.5 border ${accentColors[link.accent].border} bg-[#120c1e] px-4.5 py-3.5 text-sm text-[#9d94b8] transition-colors hover:text-[#e3dcf4]`}
               >
-                <span className="font-medium text-zinc-950 dark:text-zinc-50">
-                  {link.label}:
+                <span
+                  className={`flex h-8 w-8 flex-shrink-0 items-center justify-center ${accentColors[link.accent].iconBg} ${accentColors[link.accent].iconText}`}
+                >
+                  {link.icon}
                 </span>
-                {link.value}
+                <span>
+                  <span className="font-semibold text-white">
+                    {link.label ?? t[link.labelKey]}:
+                  </span>{" "}
+                  {link.value}
+                </span>
               </a>
             ))}
           </div>
         </section>
       </main>
 
-      <footer className="border-t border-black/[.06] py-8 text-center text-sm text-zinc-500 dark:border-white/[.08] dark:text-zinc-500">
-        © {new Date().getFullYear()} Titan. All rights reserved.
+      <footer className="relative z-[1] border-t border-white/10 py-8 text-center text-sm text-[#5c5573]">
+        {t.footer(new Date().getFullYear())}
       </footer>
+
+      <ContactFab lang={lang} />
     </div>
   );
 }

@@ -1,26 +1,66 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #0a0612;
+  --foreground: #e3dcf4;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --font-sans: var(--font-sans);
+  --font-display: var(--font-display);
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans), Arial, Helvetica, sans-serif;
+  cursor: url("/cursor-default.svg") 13 13, auto;
+}
+
+a,
+button,
+[role="button"] {
+  cursor: url("/cursor-pointer.svg") 13 13, pointer;
+}
+
+@keyframes glitch-pulse-a {
+  0%, 90%, 100% { transform: translate(0, 0); opacity: 0.75; }
+  91% { transform: translate(-6px, 2px); opacity: 0.9; }
+  93% { transform: translate(3px, -2px); opacity: 0.55; }
+  95% { transform: translate(0, 0); opacity: 0.75; }
+}
+
+@keyframes glitch-pulse-b {
+  0%, 88%, 100% { transform: translate(0, 0); opacity: 0.75; }
+  89% { transform: translate(6px, -2px); opacity: 0.9; }
+  91% { transform: translate(-3px, 2px); opacity: 0.55; }
+  93% { transform: translate(0, 0); opacity: 0.75; }
+}
+
+@keyframes glitch-flicker {
+  0%, 90%, 100% { opacity: 1; }
+  91% { opacity: 0.8; }
+  93% { opacity: 1; }
+}
+
+.glitch-layer-a {
+  animation: glitch-pulse-a 5s infinite;
+}
+
+.glitch-layer-b {
+  animation: glitch-pulse-b 5.6s infinite;
+}
+
+.glitch-main {
+  animation: glitch-flicker 5s infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .glitch-layer-a,
+  .glitch-layer-b,
+  .glitch-main {
+    animation: none;
+  }
 }
