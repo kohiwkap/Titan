@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { siTiktok } from "simple-icons";
 import { LightboxImage } from "./components/LightboxImage";
 import { ContactFab } from "./components/ContactFab";
@@ -108,15 +108,8 @@ export default function Home() {
   const [lang, setLang] = useState<Lang>("th");
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  useEffect(() => {
-    const stored = window.localStorage.getItem("titan-lang");
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    if (stored === "en" || stored === "th") setLang(stored);
-  }, []);
-
   const handleSetLang = (next: Lang) => {
     setLang(next);
-    window.localStorage.setItem("titan-lang", next);
   };
   const t = ui[lang];
 

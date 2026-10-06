@@ -91,6 +91,7 @@ export function MusicPlayer({ lang }: { lang: "en" | "th" }) {
   const [repeat, setRepeat] = useState(false);
   const [error, setError] = useState<"load" | "video" | "blocked" | null>(null);
   const playRequested = useRef(false);
+  const initialAutoplayPending = useRef(true);
   const configured = /^[\w-]{11}$/.test(MUSIC_CONFIG.videoId);
   const playlist = [MUSIC_CONFIG.videoId, ...MUSIC_CONFIG.additionalVideoIds].filter(id => /^[\w-]{11}$/.test(id));
   const multiple = playlist.length > 1;
@@ -129,6 +130,7 @@ export function MusicPlayer({ lang }: { lang: "en" | "th" }) {
             if (disposed) return;
             setPlaying(data === 1);
             if (data === 1) {
+              initialAutoplayPending.current = false;
               setError(null);
               playRequested.current = false;
             }
@@ -149,9 +151,9 @@ export function MusicPlayer({ lang }: { lang: "en" | "th" }) {
   }, [configured]);
 
   useEffect(() => {
-    if (!ready || playing) return;
+    if (!ready || playing || !initialAutoplayPending.current) return;
     const resumePlayback = () => {
-      if (!player.current || playRequested.current) return;
+      if (!player.current || playRequested.current || !initialAutoplayPending.current) return;
       playRequested.current = true;
       player.current.playVideo();
       window.setTimeout(() => { playRequested.current = false; }, 1500);
@@ -189,7 +191,11 @@ export function MusicPlayer({ lang }: { lang: "en" | "th" }) {
       <div className="music-controls">
         <button disabled={!ready || !multiple} title={multiple ? "Shuffle" : "Shuffle requires multiple tracks"} aria-label="Shuffle" aria-pressed={shuffle} onClick={() => { player.current?.setShuffle(!shuffle); setShuffle(!shuffle); }}><Icon name="shuffle" /></button>
         <button disabled={!ready} aria-label="Previous track" onClick={() => { if (multiple && position < 3) player.current?.previousVideo(); else player.current?.seekTo(0, true); }}><Icon name="previous" /></button>
-        <button className="music-play" disabled={!ready} aria-label={playing ? "Pause" : "Play"} onClick={() => { if (player.current?.getPlayerState() === 1) player.current.pauseVideo(); else player.current?.playVideo(); }}><Icon name={playing ? "pause" : "play"} /></button>
+        <button className="music-play" disabled={!ready} aria-label={playing ? "Pause" : "Play"} onClick={() => {
+          initialAutoplayPending.current = false;
+          if (player.current?.getPlayerState() === 1) player.current.pauseVideo();
+          else player.current?.playVideo();
+        }}><Icon name={playing ? "pause" : "play"} /></button>
         <button disabled={!ready || !multiple} aria-label="Next track" onClick={() => player.current?.nextVideo()}><Icon name="next" /></button>
         <button disabled={!ready} aria-label="Repeat playlist" aria-pressed={repeat} onClick={() => { player.current?.setLoop(!repeat); setRepeat(!repeat); }}><Icon name="repeat" /></button>
       </div>
